@@ -58,10 +58,29 @@ CREATE OR REPLACE FILE FORMAT CSV_FORMAT
     TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
     NULL_IF = ('NULL', 'null', '', 'N/A', 'n/a');
 
--- Using existing GITHUB_PUBLIC integration (no additional setup needed)
+-- ========================================================================
+-- GIT REPOSITORY AND STAGE SETUP FOR DATA LOADING
+-- ========================================================================
 
--- Note: Using direct GitHub integration for data loading
--- No internal stage needed - data loaded directly from GitHub repository
+-- Create Git repository integration
+CREATE OR REPLACE GIT REPOSITORY SF_AI_DEMO_REPO
+    API_INTEGRATION = GITHUB_PUBLIC
+    ORIGIN = 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO.git';
+
+-- Create internal stage for data files
+CREATE OR REPLACE STAGE INTERNAL_DATA_STAGE
+    FILE_FORMAT = CSV_FORMAT
+    COMMENT = 'Internal stage for copied demo data files'
+    DIRECTORY = ( ENABLE = TRUE)
+    ENCRYPTION = (   TYPE = 'SNOWFLAKE_SSE');
+
+-- Fetch latest changes from Git repository
+ALTER GIT REPOSITORY SF_AI_DEMO_REPO FETCH;
+
+-- Copy data files from Git repository to internal stage
+COPY FILES
+INTO @INTERNAL_DATA_STAGE/demo_data/
+FROM @SF_AI_DEMO_REPO/branches/main/demo_data/;
 
 -- ========================================================================
 -- DIMENSION TABLES
@@ -218,84 +237,70 @@ CREATE OR REPLACE TABLE guest_satisfaction_fact (
 );
 
 -- ========================================================================
--- AUTOMATED DATA LOADING FROM GITHUB
+-- DATA LOADING FROM INTERNAL STAGE
 -- ========================================================================
--- Using GITHUB_PUBLIC integration to load data directly from your repository
--- No manual uploads required!
 
--- Load Dimension Data from GitHub using GITHUB_PUBLIC integration
-COPY INTO property_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/property_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+-- Load Dimension Data from Internal Stage
+COPY INTO property_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/property_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO room_type_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/room_type_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO room_type_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/room_type_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO guest_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/guest_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO guest_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/guest_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO rate_code_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/rate_code_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO rate_code_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/rate_code_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO service_category_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/service_category_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO service_category_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/service_category_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO menu_item_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/menu_item_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO menu_item_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/menu_item_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO campaign_dim 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/campaign_dim.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO campaign_dim
+    FROM @INTERNAL_DATA_STAGE/demo_data/campaign_dim.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
--- Load Fact Data from GitHub
-COPY INTO reservations_fact 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/reservations_fact.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+-- Load Fact Data from Internal Stage
+COPY INTO reservations_fact
+    FROM @INTERNAL_DATA_STAGE/demo_data/reservations_fact.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO pos_transactions_fact 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/pos_transactions_fact.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO pos_transactions_fact
+    FROM @INTERNAL_DATA_STAGE/demo_data/pos_transactions_fact.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO guest_preferences_fact 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/guest_preferences_fact.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO guest_preferences_fact
+    FROM @INTERNAL_DATA_STAGE/demo_data/guest_preferences_fact.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO marketing_campaigns_fact 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/marketing_campaigns_fact.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO marketing_campaigns_fact
+    FROM @INTERNAL_DATA_STAGE/demo_data/marketing_campaigns_fact.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
-COPY INTO guest_satisfaction_fact 
-FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/guest_satisfaction_fact.csv'
-USING INTEGRATION GITHUB_PUBLIC
-FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
-ON_ERROR = 'CONTINUE';
+COPY INTO guest_satisfaction_fact
+    FROM @INTERNAL_DATA_STAGE/demo_data/guest_satisfaction_fact.csv
+    FILE_FORMAT = CSV_FORMAT
+    ON_ERROR = 'CONTINUE';
 
 -- ========================================================================
 -- VERIFICATION QUERIES - RUN THESE FIRST TO DEBUG ISSUES
@@ -375,7 +380,7 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PMS_SEMANTIC_V
         RESERVATIONS_TO_RATES as RESERVATIONS(RATE_CODE_KEY) references RATE_CODES(RATE_CODE_KEY)
     )
     FACTS (
-        RESERVATIONS.RESERVATION_AMOUNT as total_amount comment='Total reservation amount in dollars',
+        RESERVATIONS.TOTAL_AMOUNT as total_amount comment='Total reservation amount in dollars',
         RESERVATIONS.NIGHTS_STAYED as nights_stayed comment='Number of nights stayed',
         RESERVATIONS.ROOM_RATE as room_rate comment='Nightly room rate',
         RESERVATIONS.RESERVATION_RECORD as 1 comment='Count of reservations'
@@ -391,16 +396,16 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PMS_SEMANTIC_V
         PROPERTIES.PROPERTY_NAME as property_name with synonyms=('hotel name','property') comment='Name of the hotel property',
         PROPERTIES.CITY as city comment='Hotel city location',
         PROPERTIES.STATE as state comment='Hotel state location',
-        ROOM_TYPES."ROOM_TYPE_NAME" as room_type with synonyms=('room category') comment='Type of room booked',
+        ROOM_TYPES.ROOM_TYPE_NAME as room_type with synonyms=('room category') comment='Type of room booked',
         RATE_CODES.RATE_CODE as rate_code comment='Rate code used for booking',
         RATE_CODES.RATE_DESCRIPTION as rate_description comment='Description of the rate code'
     )
     METRICS (
-        RESERVATIONS.TOTAL_REVENUE as SUM(reservations.total_amount) comment='Total revenue from reservations',
-        RESERVATIONS.AVERAGE_DAILY_RATE as AVG(reservations.room_rate) comment='Average daily room rate (ADR)',
-        RESERVATIONS.TOTAL_NIGHTS as SUM(reservations.nights_stayed) comment='Total nights booked',
-        RESERVATIONS.TOTAL_RESERVATIONS as COUNT(reservations.reservation_record) comment='Total number of reservations',
-        RESERVATIONS.AVERAGE_LENGTH_OF_STAY as AVG(reservations.nights_stayed) comment='Average length of stay'
+        RESERVATIONS.TOTAL_REVENUE as SUM(RESERVATIONS.total_amount) comment='Total revenue from reservations',
+        RESERVATIONS.AVERAGE_DAILY_RATE as AVG(RESERVATIONS.room_rate) comment='Average daily room rate (ADR),'
+        RESERVATIONS.TOTAL_NIGHTS as SUM(RESERVATIONS.nights_stayed) comment='Total nights booked',
+        RESERVATIONS.TOTAL_RESERVATIONS as COUNT(RESERVATIONS.reservation_record) comment='Total number of reservations',
+        RESERVATIONS.AVERAGE_LENGTH_OF_STAY as AVG(RESERVATIONS.nights_stayed) comment='Average length of stay'
     )
     COMMENT='Semantic view for Property Management System (PMS) data analysis';
 
@@ -420,7 +425,7 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.POS_SEMANTIC_V
         TRANSACTIONS_TO_PROPERTIES as TRANSACTIONS(PROPERTY_KEY) references PROPERTIES(PROPERTY_KEY)
     )
     FACTS (
-        TRANSACTIONS.TRANSACTION_AMOUNT as total_amount comment='Transaction amount in dollars',
+        TRANSACTIONS.TOTAL_AMOUNT as total_amount comment='Transaction amount in dollars',
         TRANSACTIONS.QUANTITY as quantity comment='Quantity of items purchased',
         TRANSACTIONS.UNIT_PRICE as unit_price comment='Unit price of item',
         TRANSACTIONS.TRANSACTION_RECORD as 1 comment='Count of transactions'
@@ -437,10 +442,10 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.POS_SEMANTIC_V
         PROPERTIES.PROPERTY_NAME as property_name with synonyms=('hotel name') comment='Hotel property name'
     )
     METRICS (
-        TRANSACTIONS.TOTAL_REVENUE as SUM(transactions.total_amount) comment='Total revenue from all transactions',
-        TRANSACTIONS.AVERAGE_TRANSACTION as AVG(transactions.total_amount) comment='Average transaction amount',
-        TRANSACTIONS.TOTAL_TRANSACTIONS as COUNT(transactions.transaction_record) comment='Total number of transactions',
-        TRANSACTIONS.TOTAL_QUANTITY as SUM(transactions.quantity) comment='Total quantity of items sold'
+        TRANSACTIONS.TOTAL_REVENUE as SUM(TRANSACTIONS.total_amount) comment='Total revenue from all transactions',
+        TRANSACTIONS.AVERAGE_TRANSACTION as AVG(TRANSACTIONS.total_amount) comment='Average transaction amount',
+        TRANSACTIONS.TOTAL_TRANSACTIONS as COUNT(TRANSACTIONS.transaction_record) comment='Total number of transactions',
+        TRANSACTIONS.TOTAL_QUANTITY as SUM(TRANSACTIONS.quantity) comment='Total quantity of items sold'
     )
     COMMENT='Semantic view for Point of Sale (POS) system data analysis';
 
@@ -494,16 +499,16 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.CRM_SEMANTIC_V
         PROPERTIES.PROPERTY_NAME as property_name comment='Hotel property name'
     )
     METRICS (
-        CAMPAIGNS.TOTAL_CAMPAIGN_REVENUE as SUM(campaigns.revenue_generated) comment='Total revenue from marketing campaigns',
-        CAMPAIGNS.CAMPAIGN_CONVERSION_RATE as AVG(campaigns.booking_generated) comment='Campaign conversion rate',
-        CAMPAIGNS.TOTAL_CAMPAIGNS as COUNT(campaigns.campaign_record) comment='Total number of campaign interactions',
-        SATISFACTION.AVERAGE_OVERALL_RATING as AVG(satisfaction.overall_rating) comment='Average overall satisfaction rating',
-        SATISFACTION.AVERAGE_SERVICE_RATING as AVG(satisfaction.service_rating) comment='Average service rating',
-        SATISFACTION.AVERAGE_ROOM_RATING as AVG(satisfaction.room_rating) comment='Average room rating',
-        SATISFACTION.AVERAGE_DINING_RATING as AVG(satisfaction.dining_rating) comment='Average dining rating',
-        SATISFACTION.AVERAGE_VALUE_RATING as AVG(satisfaction.value_rating) comment='Average value rating',
-        SATISFACTION.AVERAGE_RECOMMEND_LIKELIHOOD as AVG(satisfaction.recommend_likelihood) comment='Average likelihood to recommend',
-        SATISFACTION.TOTAL_SURVEYS as COUNT(satisfaction.satisfaction_record) comment='Total number of satisfaction surveys'
+        CAMPAIGNS.TOTAL_CAMPAIGN_REVENUE as SUM(CAMPAIGNS.revenue_generated) comment='Total revenue from marketing campaigns',
+        CAMPAIGNS.CAMPAIGN_CONVERSION_RATE as AVG(CAMPAIGNS.booking_generated) comment='Campaign conversion rate',
+        CAMPAIGNS.TOTAL_CAMPAIGNS as COUNT(CAMPAIGNS.campaign_record) comment='Total number of campaign interactions',
+        SATISFACTION.AVERAGE_OVERALL_RATING as AVG(SATISFACTION.overall_rating) comment='Average overall satisfaction rating',
+        SATISFACTION.AVERAGE_SERVICE_RATING as AVG(SATISFACTION.service_rating) comment='Average service rating',
+        SATISFACTION.AVERAGE_ROOM_RATING as AVG(SATISFACTION.room_rating) comment='Average room rating',
+        SATISFACTION.AVERAGE_DINING_RATING as AVG(SATISFACTION.dining_rating) comment='Average dining rating',
+        SATISFACTION.AVERAGE_VALUE_RATING as AVG(SATISFACTION.value_rating) comment='Average value rating',
+        SATISFACTION.AVERAGE_RECOMMEND_LIKELIHOOD as AVG(SATISFACTION.recommend_likelihood) comment='Average likelihood to recommend',
+        SATISFACTION.TOTAL_SURVEYS as COUNT(SATISFACTION.satisfaction_record) comment='Total number of satisfaction surveys'
     )
     COMMENT='Semantic view for Customer Relationship Management (CRM) data analysis';
 
@@ -551,8 +556,8 @@ SELECT '', 'guest_satisfaction_fact', COUNT(*) FROM guest_satisfaction_fact;
 -- ========================================================================
 -- NEXT STEPS
 -- ========================================================================
--- 1. Upload CSV files to @HOTEL_DATA_STAGE
--- 2. Uncomment and run the COPY INTO statements above
+-- 1. Data files are automatically loaded from Git repository to @INTERNAL_DATA_STAGE
+-- 2. All COPY INTO statements are executed as part of this script
 -- 3. Create Cortex Search services for unstructured documents
 -- 4. Create Snowflake Intelligence Agent with the three semantic views
 -- ========================================================================
