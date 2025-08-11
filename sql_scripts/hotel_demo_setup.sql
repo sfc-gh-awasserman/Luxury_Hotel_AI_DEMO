@@ -58,26 +58,10 @@ CREATE OR REPLACE FILE FORMAT CSV_FORMAT
     TIMESTAMP_FORMAT = 'YYYY-MM-DD HH24:MI:SS'
     NULL_IF = ('NULL', 'null', '', 'N/A', 'n/a');
 
--- Switch to accountadmin for API integration
-USE ROLE accountadmin;
+-- Using existing GITHUB_PUBLIC integration (no additional setup needed)
 
--- Create API Integration for GitHub (you'll need to update this with your repo)
-CREATE OR REPLACE API INTEGRATION hotel_git_api_integration
-    API_PROVIDER = git_https_api
-    API_ALLOWED_PREFIXES = ('https://github.com/')
-    ENABLED = TRUE;
-
-GRANT USAGE ON INTEGRATION hotel_git_api_integration TO ROLE Luxury_Hotel_Demo;
-
--- Switch back to demo role
-USE ROLE Luxury_Hotel_Demo;
-
--- Create internal stage for data files
-CREATE OR REPLACE STAGE HOTEL_DATA_STAGE
-    FILE_FORMAT = CSV_FORMAT
-    COMMENT = 'Internal stage for hotel demo data files'
-    DIRECTORY = ( ENABLE = TRUE)
-    ENCRYPTION = ( TYPE = 'SNOWFLAKE_SSE');
+-- Note: Using direct GitHub integration for data loading
+-- No internal stage needed - data loaded directly from GitHub repository
 
 -- ========================================================================
 -- DIMENSION TABLES
@@ -234,28 +218,84 @@ CREATE OR REPLACE TABLE guest_satisfaction_fact (
 );
 
 -- ========================================================================
--- LOAD DATA FROM INTERNAL STAGE (Manual Upload Required)
+-- AUTOMATED DATA LOADING FROM GITHUB
 -- ========================================================================
--- Note: You'll need to upload the CSV files to the stage manually
--- Then uncomment and run these COPY INTO statements
+-- Using GITHUB_PUBLIC integration to load data directly from your repository
+-- No manual uploads required!
 
-/*
--- Load Dimension Data
-COPY INTO property_dim FROM @HOTEL_DATA_STAGE/property_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO room_type_dim FROM @HOTEL_DATA_STAGE/room_type_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO guest_dim FROM @HOTEL_DATA_STAGE/guest_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO rate_code_dim FROM @HOTEL_DATA_STAGE/rate_code_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO service_category_dim FROM @HOTEL_DATA_STAGE/service_category_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO menu_item_dim FROM @HOTEL_DATA_STAGE/menu_item_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO campaign_dim FROM @HOTEL_DATA_STAGE/campaign_dim.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
+-- Load Dimension Data from GitHub using GITHUB_PUBLIC integration
+COPY INTO property_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/property_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
 
--- Load Fact Data
-COPY INTO reservations_fact FROM @HOTEL_DATA_STAGE/reservations_fact.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO pos_transactions_fact FROM @HOTEL_DATA_STAGE/pos_transactions_fact.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO guest_preferences_fact FROM @HOTEL_DATA_STAGE/guest_preferences_fact.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO marketing_campaigns_fact FROM @HOTEL_DATA_STAGE/marketing_campaigns_fact.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-COPY INTO guest_satisfaction_fact FROM @HOTEL_DATA_STAGE/guest_satisfaction_fact.csv FILE_FORMAT = CSV_FORMAT ON_ERROR = 'CONTINUE';
-*/
+COPY INTO room_type_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/room_type_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO guest_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/guest_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO rate_code_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/rate_code_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO service_category_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/service_category_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO menu_item_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/menu_item_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO campaign_dim 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/campaign_dim.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+-- Load Fact Data from GitHub
+COPY INTO reservations_fact 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/reservations_fact.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO pos_transactions_fact 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/pos_transactions_fact.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO guest_preferences_fact 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/guest_preferences_fact.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO marketing_campaigns_fact 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/marketing_campaigns_fact.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
+
+COPY INTO guest_satisfaction_fact 
+FROM 'https://github.com/sfc-gh-awasserman/Luxury_Hotel_AI_DEMO/raw/main/demo_data/guest_satisfaction_fact.csv'
+USING INTEGRATION GITHUB_PUBLIC
+FILE_FORMAT = (TYPE = 'CSV' SKIP_HEADER = 1 FIELD_OPTIONALLY_ENCLOSED_BY = '"')
+ON_ERROR = 'CONTINUE';
 
 -- ========================================================================
 -- VERIFICATION QUERIES - RUN THESE FIRST TO DEBUG ISSUES
@@ -291,6 +331,32 @@ SELECT * FROM room_type_dim LIMIT 3;
 -- 
 -- DEBUG: If you're still getting ROOM_TYPE errors, try this simple test first:
 -- SELECT room_type_key, room_type_name FROM room_type_dim LIMIT 3;
+--
+-- TEST WITHOUT RELATIONSHIPS: Maybe the issue is with the relationship or key:
+/*
+CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.TEST_SEMANTIC_VIEW
+    TABLES (
+        RESERVATIONS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.RESERVATIONS_FACT primary key (RESERVATION_ID),
+        ROOM_TYPES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.ROOM_TYPE_DIM primary key (ROOM_TYPE_KEY)
+    )
+    FACTS (
+        RESERVATIONS.TOTAL_AMOUNT as total_amount comment='Total reservation amount'
+    )
+    DIMENSIONS (
+        RESERVATIONS.CHECK_IN_DATE as check_in_date comment='Check-in date'
+    );
+*/
+
+-- ALTERNATIVE: Try just the room type table by itself:
+/*
+CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.ROOM_TYPE_TEST_VIEW
+    TABLES (
+        ROOM_TYPES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.ROOM_TYPE_DIM primary key (ROOM_TYPE_KEY)
+    )
+    DIMENSIONS (
+        ROOM_TYPES.ROOM_TYPE_NAME as room_type comment='Room type'
+    );
+*/
 -- ========================================================================
 
 -- PMS (Property Management System) Semantic View
