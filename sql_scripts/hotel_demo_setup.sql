@@ -287,7 +287,8 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PMS_SEMANTIC_V
         RESERVATIONS.CHECK_OUT_DATE as check_out_date with synonyms=('departure date','end date') comment='Guest check-out date',
         RESERVATIONS.BOOKING_DATE as booking_date with synonyms=('reservation date') comment='Date reservation was made',
         RESERVATIONS.BOOKING_CHANNEL as booking_channel with synonyms=('channel','source') comment='How reservation was booked',
-        GUESTS.GUEST_NAME as CONCAT(guest_first_name, ' ', guest_last_name) with synonyms=('guest name','customer name') comment='Full guest name',
+        GUESTS.GUEST_FIRST_NAME as guest_first_name with synonyms=('first name') comment='Guest first name',
+        GUESTS.GUEST_LAST_NAME as guest_last_name with synonyms=('last name') comment='Guest last name',
         GUESTS.LOYALTY_TIER as loyalty_tier with synonyms=('loyalty level','membership tier') comment='Guest loyalty program tier',
         PROPERTIES.PROPERTY_NAME as property_name with synonyms=('hotel name','property') comment='Name of the hotel property',
         PROPERTIES.CITY as city comment='Hotel city location',
@@ -333,7 +334,8 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.POS_SEMANTIC_V
         MENU_ITEMS.CATEGORY as item_category comment='Category of menu item',
         SERVICE_CATEGORIES.CATEGORY_NAME as service_category with synonyms=('department') comment='Service category or department',
         SERVICE_CATEGORIES.DEPARTMENT as department comment='Operating department',
-        GUESTS.GUEST_NAME as CONCAT(guest_first_name, ' ', guest_last_name) with synonyms=('customer name') comment='Guest name',
+        GUESTS.GUEST_FIRST_NAME as guest_first_name with synonyms=('first name') comment='Guest first name',
+        GUESTS.GUEST_LAST_NAME as guest_last_name with synonyms=('last name','customer name') comment='Guest last name',
         PROPERTIES.PROPERTY_NAME as property_name with synonyms=('hotel name') comment='Hotel property name'
     )
     METRICS (
@@ -388,7 +390,8 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.CRM_SEMANTIC_V
         SATISFACTION.COMMENTS as comments comment='Guest comments and feedback',
         PREFERENCES.PREFERENCE_TYPE as preference_type comment='Type of guest preference',
         PREFERENCES.PREFERENCE_VALUE as preference_value comment='Specific preference details',
-        GUESTS.GUEST_NAME as CONCAT(guest_first_name, ' ', guest_last_name) with synonyms=('customer name') comment='Guest name',
+        GUESTS.GUEST_FIRST_NAME as guest_first_name with synonyms=('first name') comment='Guest first name',
+        GUESTS.GUEST_LAST_NAME as guest_last_name with synonyms=('last name','customer name') comment='Guest last name',
         GUESTS.LOYALTY_TIER as loyalty_tier comment='Guest loyalty program tier',
         PROPERTIES.PROPERTY_NAME as property_name comment='Hotel property name'
     )
