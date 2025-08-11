@@ -1,0 +1,16 @@
+preference_id,guest_key,property_key,preference_type,preference_value,created_date,last_updated
+1,1,1,Room,High Floor,2020-03-15,2025-01-15
+2,1,1,Pillow,Hypoallergenic,2020-03-15,2025-01-15
+3,1,1,Dining,Vegetarian Options,2021-05-10,2025-01-15
+4,2,2,Room,City View,2021-07-22,2025-01-20
+5,2,2,Service,Early Check-in,2021-07-22,2025-01-20
+6,3,3,Room,Ocean View,2022-01-10,2025-02-01
+7,3,3,Dining,Gluten Free,2022-01-10,2025-02-01
+8,4,5,Room,Quiet Location,2019-11-05,2025-02-14
+9,4,5,Service,Late Checkout,2019-11-05,2025-02-14
+10,5,4,Room,Business Floor,2020-12-18,2025-02-20
+11,6,7,Service,Spa Services,2022-05-30,2025-03-01
+12,7,6,Dining,Wine Pairing,2021-09-12,2025-03-10
+13,8,1,Room,Beach Access,2020-08-25,2025-03-15
+14,9,8,Service,Fitness Classes,2022-03-07,2025-04-01
+15,10,2,Service,Concierge Services,2019-06-14,2025-04-10

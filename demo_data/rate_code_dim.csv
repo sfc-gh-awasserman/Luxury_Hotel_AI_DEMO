@@ -1,0 +1,11 @@
+rate_code_key,rate_code,rate_description,discount_percent
+1,BAR,Best Available Rate,0.00
+2,ADV7,Advance Purchase 7 Days,15.00
+3,ADV14,Advance Purchase 14 Days,20.00
+4,ADV21,Advance Purchase 21 Days,25.00
+5,CORP,Corporate Rate,10.00
+6,GOV,Government Rate,12.00
+7,AAA,AAA Member Rate,8.00
+8,SEN,Senior Citizen Rate,10.00
+9,PKG,Package Deal,5.00
+10,PROMO,Promotional Rate,30.00

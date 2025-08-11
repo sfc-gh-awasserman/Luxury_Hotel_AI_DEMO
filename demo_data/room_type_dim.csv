@@ -1,0 +1,9 @@
+room_type_key,room_type_name,base_rate,max_occupancy,amenities
+1,Standard King,299.00,2,WiFi|Coffee Maker|Safe
+2,Standard Queen,279.00,2,WiFi|Coffee Maker|Safe
+3,Deluxe Ocean View,399.00,2,WiFi|Coffee Maker|Safe|Balcony|Ocean View
+4,Executive Suite,599.00,4,WiFi|Coffee Maker|Safe|Living Area|Kitchenette
+5,Presidential Suite,1299.00,6,WiFi|Coffee Maker|Safe|Living Area|Full Kitchen|Dining Room|Butler Service
+6,Junior Suite,449.00,2,WiFi|Coffee Maker|Safe|Living Area
+7,Penthouse Suite,1999.00,8,WiFi|Coffee Maker|Safe|Living Area|Full Kitchen|Dining Room|Butler Service|Private Terrace
+8,Deluxe Mountain View,379.00,2,WiFi|Coffee Maker|Safe|Balcony|Mountain View

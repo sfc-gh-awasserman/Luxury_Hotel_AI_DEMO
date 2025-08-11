@@ -1,0 +1,19 @@
+menu_item_key,item_name,category,price,service_category_key,description
+1,Wagyu Beef Tenderloin,Entree,65.00,1,Prime cut with truffle sauce
+2,Fresh Lobster Thermidor,Entree,48.00,1,Atlantic lobster with herb butter
+3,Pan-Seared Salmon,Entree,32.00,1,Wild salmon with lemon risotto
+4,Filet Mignon,Entree,42.00,1,8oz prime beef with seasonal vegetables
+5,Caesar Salad,Appetizer,16.00,1,Romaine lettuce with homemade dressing
+6,Oysters Rockefeller,Appetizer,24.00,1,Fresh oysters with spinach and herbs
+7,Chocolate Soufflé,Dessert,18.00,1,Warm chocolate soufflé with vanilla ice cream
+8,Crème Brûlée,Dessert,14.00,1,Classic French custard with caramelized sugar
+9,Dom Pérignon Champagne,Champagne,350.00,2,Premium champagne by the bottle
+10,Old Fashioned,Cocktail,18.00,2,Premium whiskey cocktail
+11,Martini,Cocktail,16.00,2,Classic gin or vodka martini
+12,Wine Selection,Wine,45.00,2,Curated wine selection by the glass
+13,Continental Breakfast,Breakfast,28.00,3,Room service breakfast package
+14,Gourmet Burger,Lunch,24.00,3,Wagyu beef burger with truffle fries
+15,Deep Tissue Massage,Spa Treatment,180.00,4,90-minute therapeutic massage
+16,Facial Treatment,Spa Treatment,150.00,4,Luxury facial with organic products
+17,Personal Training,Fitness,85.00,5,One-hour personal training session
+18,Yoga Class,Fitness,25.00,5,Group yoga session

@@ -1,0 +1,13 @@
+service_category_key,category_name,department
+1,Restaurant,Food & Beverage
+2,Bar & Lounge,Food & Beverage
+3,Room Service,Food & Beverage
+4,Spa Services,Wellness
+5,Fitness,Wellness
+6,Pool Services,Recreation
+7,Concierge,Guest Services
+8,Housekeeping,Operations
+9,Laundry,Operations
+10,Business Services,Guest Services
+11,Transportation,Guest Services
+12,Event Services,Events

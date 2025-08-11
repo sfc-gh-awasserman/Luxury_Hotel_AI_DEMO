@@ -1,0 +1,11 @@
+guest_key,guest_first_name,guest_last_name,email,phone,loyalty_tier,join_date,address,city,state,country,date_of_birth
+1,Michael,Johnson,michael.johnson@email.com,555-0101,Platinum,2020-03-15,123 Oak Street,Atlanta,GA,USA,1985-04-12
+2,Sarah,Williams,sarah.williams@email.com,555-0102,Gold,2021-07-22,456 Pine Avenue,Seattle,WA,USA,1978-11-28
+3,David,Brown,david.brown@email.com,555-0103,Silver,2022-01-10,789 Maple Drive,Phoenix,AZ,USA,1990-06-15
+4,Emily,Davis,emily.davis@email.com,555-0104,Platinum,2019-11-05,321 Elm Street,Denver,CO,USA,1982-09-03
+5,Robert,Miller,robert.miller@email.com,555-0105,Gold,2020-12-18,654 Cedar Lane,Portland,OR,USA,1975-12-20
+6,Jennifer,Wilson,jennifer.wilson@email.com,555-0106,Silver,2022-05-30,987 Birch Road,Austin,TX,USA,1988-02-14
+7,Christopher,Moore,christopher.moore@email.com,555-0107,Platinum,2021-09-12,147 Walnut Court,Nashville,TN,USA,1980-07-08
+8,Jessica,Taylor,jessica.taylor@email.com,555-0108,Gold,2020-08-25,258 Spruce Way,Charlotte,NC,USA,1987-10-22
+9,Matthew,Anderson,matthew.anderson@email.com,555-0109,Silver,2022-03-07,369 Aspen Drive,Las Vegas,NV,USA,1992-01-18
+10,Amanda,Thomas,amanda.thomas@email.com,555-0110,Platinum,2019-06-14,741 Cypress Street,Tampa,FL,USA,1983-05-30

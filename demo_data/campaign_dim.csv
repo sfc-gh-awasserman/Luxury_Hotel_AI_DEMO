@@ -1,0 +1,11 @@
+campaign_key,campaign_name,campaign_type,start_date,end_date,target_segment
+1,Summer Luxury Escape,Seasonal,2025-06-01,2025-08-31,Leisure Travelers
+2,Business Executive Package,Corporate,2025-01-01,2025-12-31,Business Travelers
+3,Romantic Getaway Special,Promotional,2025-02-01,2025-02-28,Couples
+4,Spa & Wellness Retreat,Lifestyle,2025-01-15,2025-12-15,Wellness Seekers
+5,Family Fun Package,Seasonal,2025-06-15,2025-09-15,Families
+6,Holiday Celebration,Seasonal,2025-11-20,2025-01-05,Holiday Travelers
+7,Loyalty Appreciation,Retention,2025-01-01,2025-12-31,Loyalty Members
+8,Early Bird Special,Promotional,2025-03-01,2025-05-31,Price-Sensitive Travelers
+9,Weekend Wine & Dine,Lifestyle,2025-01-01,2025-12-31,Food & Wine Enthusiasts
+10,Corporate Retreat Package,Corporate,2025-01-01,2025-12-31,Corporate Groups
