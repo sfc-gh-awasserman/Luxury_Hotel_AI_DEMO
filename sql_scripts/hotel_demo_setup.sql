@@ -258,17 +258,49 @@ COPY INTO guest_satisfaction_fact FROM @HOTEL_DATA_STAGE/guest_satisfaction_fact
 */
 
 -- ========================================================================
+-- VERIFICATION QUERIES - RUN THESE FIRST TO DEBUG ISSUES
+-- ========================================================================
+/*
+-- Check if tables exist and have data
+SELECT 'property_dim' as table_name, COUNT(*) as row_count FROM property_dim
+UNION ALL SELECT 'room_type_dim', COUNT(*) FROM room_type_dim
+UNION ALL SELECT 'guest_dim', COUNT(*) FROM guest_dim
+UNION ALL SELECT 'rate_code_dim', COUNT(*) FROM rate_code_dim
+UNION ALL SELECT 'reservations_fact', COUNT(*) FROM reservations_fact;
+
+-- Check room_type_dim structure specifically
+DESCRIBE TABLE room_type_dim;
+
+-- Check column names in room_type_dim - THIS WILL TELL US THE EXACT COLUMN NAMES
+SELECT column_name FROM information_schema.columns 
+WHERE table_name = 'ROOM_TYPE_DIM' 
+AND table_schema = 'HOTEL_SCHEMA';
+
+-- Also try this query to see actual data and column names
+SELECT * FROM room_type_dim LIMIT 3;
+*/
+
+-- ========================================================================
 -- SEMANTIC VIEWS FOR CORTEX ANALYST
+-- ========================================================================
+-- IMPORTANT: Only run this section AFTER:
+-- 1. All tables have been created (above)
+-- 2. CSV files have been uploaded to @HOTEL_DATA_STAGE 
+-- 3. COPY INTO statements have been executed successfully
+-- 4. Tables contain data (verify with verification queries above)
+-- 
+-- DEBUG: If you're still getting ROOM_TYPE errors, try this simple test first:
+-- SELECT room_type_key, room_type_name FROM room_type_dim LIMIT 3;
 -- ========================================================================
 
 -- PMS (Property Management System) Semantic View
 CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PMS_SEMANTIC_VIEW
     TABLES (
-        RESERVATIONS as RESERVATIONS_FACT primary key (RESERVATION_ID) with synonyms=('bookings','reservations','stays') comment='Hotel reservations and booking data',
-        GUESTS as GUEST_DIM primary key (GUEST_KEY) with synonyms=('customers','guests','travelers') comment='Guest profile information',
-        PROPERTIES as PROPERTY_DIM primary key (PROPERTY_KEY) with synonyms=('hotels','properties','locations') comment='Hotel properties in the chain',
-        ROOM_TYPES as ROOM_TYPE_DIM primary key (ROOM_TYPE_KEY) with synonyms=('rooms','room categories') comment='Different room types and rates',
-        RATE_CODES as RATE_CODE_DIM primary key (RATE_CODE_KEY) with synonyms=('rates','pricing','discounts') comment='Rate codes and pricing structures'
+        RESERVATIONS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.RESERVATIONS_FACT primary key (RESERVATION_ID) with synonyms=('bookings','reservations','stays') comment='Hotel reservations and booking data',
+        GUESTS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.GUEST_DIM primary key (GUEST_KEY) with synonyms=('customers','guests','travelers') comment='Guest profile information',
+        PROPERTIES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PROPERTY_DIM primary key (PROPERTY_KEY) with synonyms=('hotels','properties','locations') comment='Hotel properties in the chain',
+        ROOM_TYPES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.ROOM_TYPE_DIM primary key (ROOM_TYPE_KEY) with synonyms=('rooms','room categories') comment='Different room types and rates',
+        RATE_CODES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.RATE_CODE_DIM primary key (RATE_CODE_KEY) with synonyms=('rates','pricing','discounts') comment='Rate codes and pricing structures'
     )
     RELATIONSHIPS (
         RESERVATIONS_TO_GUESTS as RESERVATIONS(GUEST_KEY) references GUESTS(GUEST_KEY),
@@ -293,7 +325,7 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PMS_SEMANTIC_V
         PROPERTIES.PROPERTY_NAME as property_name with synonyms=('hotel name','property') comment='Name of the hotel property',
         PROPERTIES.CITY as city comment='Hotel city location',
         PROPERTIES.STATE as state comment='Hotel state location',
-        ROOM_TYPES.ROOM_TYPE_NAME as room_type with synonyms=('room category') comment='Type of room booked',
+        ROOM_TYPES."ROOM_TYPE_NAME" as room_type with synonyms=('room category') comment='Type of room booked',
         RATE_CODES.RATE_CODE as rate_code comment='Rate code used for booking',
         RATE_CODES.RATE_DESCRIPTION as rate_description comment='Description of the rate code'
     )
@@ -309,11 +341,11 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PMS_SEMANTIC_V
 -- POS (Point of Sale) Semantic View
 CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.POS_SEMANTIC_VIEW
     TABLES (
-        TRANSACTIONS as POS_TRANSACTIONS_FACT primary key (TRANSACTION_ID) with synonyms=('sales','purchases','orders') comment='Point of sale transaction data',
-        MENU_ITEMS as MENU_ITEM_DIM primary key (MENU_ITEM_KEY) with synonyms=('products','items','offerings') comment='Menu items and services offered',
-        SERVICE_CATEGORIES as SERVICE_CATEGORY_DIM primary key (SERVICE_CATEGORY_KEY) with synonyms=('departments','categories') comment='Service categories and departments',
-        GUESTS as GUEST_DIM primary key (GUEST_KEY) with synonyms=('customers','guests') comment='Guest information for transactions',
-        PROPERTIES as PROPERTY_DIM primary key (PROPERTY_KEY) with synonyms=('hotels','locations') comment='Hotel properties'
+        TRANSACTIONS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.POS_TRANSACTIONS_FACT primary key (TRANSACTION_ID) with synonyms=('sales','purchases','orders') comment='Point of sale transaction data',
+        MENU_ITEMS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.MENU_ITEM_DIM primary key (MENU_ITEM_KEY) with synonyms=('products','items','offerings') comment='Menu items and services offered',
+        SERVICE_CATEGORIES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.SERVICE_CATEGORY_DIM primary key (SERVICE_CATEGORY_KEY) with synonyms=('departments','categories') comment='Service categories and departments',
+        GUESTS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.GUEST_DIM primary key (GUEST_KEY) with synonyms=('customers','guests') comment='Guest information for transactions',
+        PROPERTIES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PROPERTY_DIM primary key (PROPERTY_KEY) with synonyms=('hotels','locations') comment='Hotel properties'
     )
     RELATIONSHIPS (
         TRANSACTIONS_TO_MENU_ITEMS as TRANSACTIONS(MENU_ITEM_KEY) references MENU_ITEMS(MENU_ITEM_KEY),
@@ -349,12 +381,12 @@ CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.POS_SEMANTIC_V
 -- CRM (Customer Relationship Management) Semantic View
 CREATE OR REPLACE SEMANTIC VIEW LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.CRM_SEMANTIC_VIEW
     TABLES (
-        CAMPAIGNS as MARKETING_CAMPAIGNS_FACT primary key (CAMPAIGN_FACT_ID) with synonyms=('marketing','promotions') comment='Marketing campaign performance data',
-        CAMPAIGN_DETAILS as CAMPAIGN_DIM primary key (CAMPAIGN_KEY) with synonyms=('campaign info') comment='Campaign details and descriptions',
-        SATISFACTION as GUEST_SATISFACTION_FACT primary key (SATISFACTION_ID) with synonyms=('reviews','feedback','surveys') comment='Guest satisfaction and survey data',
-        PREFERENCES as GUEST_PREFERENCES_FACT primary key (PREFERENCE_ID) with synonyms=('guest preferences','customer preferences') comment='Guest preferences and special requests',
-        GUESTS as GUEST_DIM primary key (GUEST_KEY) with synonyms=('customers','guests') comment='Guest profile information',
-        PROPERTIES as PROPERTY_DIM primary key (PROPERTY_KEY) with synonyms=('hotels','properties') comment='Hotel properties'
+        CAMPAIGNS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.MARKETING_CAMPAIGNS_FACT primary key (CAMPAIGN_FACT_ID) with synonyms=('marketing','promotions') comment='Marketing campaign performance data',
+        CAMPAIGN_DETAILS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.CAMPAIGN_DIM primary key (CAMPAIGN_KEY) with synonyms=('campaign info') comment='Campaign details and descriptions',
+        SATISFACTION as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.GUEST_SATISFACTION_FACT primary key (SATISFACTION_ID) with synonyms=('reviews','feedback','surveys') comment='Guest satisfaction and survey data',
+        PREFERENCES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.GUEST_PREFERENCES_FACT primary key (PREFERENCE_ID) with synonyms=('guest preferences','customer preferences') comment='Guest preferences and special requests',
+        GUESTS as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.GUEST_DIM primary key (GUEST_KEY) with synonyms=('customers','guests') comment='Guest profile information',
+        PROPERTIES as LUXURY_HOTEL_AI_DEMO.HOTEL_SCHEMA.PROPERTY_DIM primary key (PROPERTY_KEY) with synonyms=('hotels','properties') comment='Hotel properties'
     )
     RELATIONSHIPS (
         CAMPAIGNS_TO_DETAILS as CAMPAIGNS(CAMPAIGN_KEY) references CAMPAIGN_DETAILS(CAMPAIGN_KEY),
